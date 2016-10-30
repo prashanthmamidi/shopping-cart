@@ -18,36 +18,39 @@ public class CheckoutTest {
     private final Checkout checkout = new Checkout();
 
     @Rule
-    public ExpectedException expection = ExpectedException.none();
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void checkout_returnsZeroAmount_givenEmptyBasket() throws Exception {
         BigDecimal actualAmount = checkout.evaluateBasket(emptyList());
-        assertThat(actualAmount, is(valueOf(0.00).setScale(2, ROUND_HALF_UP)));
+        assertThat(actualAmount, is(value(0.00)));
     }
 
     @Test
     public void checkout_throwsInvalidItemInBasketException_givenBasketContainsOtherThanAppleOrOrange() throws Exception {
-        expection.expect(InvalidItemInBasketException.class);
-        expection.expectMessage("Invalid Item in the basket.");
+        exception.expect(InvalidItemInBasketException.class);
+        exception.expectMessage("Invalid Item in the basket.");
         checkout.evaluateBasket(singletonList("Banana"));
     }
 
     @Test
     public void checkout_returns60p_givenOnlyOneAppleInBasket() throws Exception {
         BigDecimal actualAmount = checkout.evaluateBasket(singletonList("Apple"));
-        assertThat(actualAmount, is(valueOf(0.60).setScale(2, ROUND_HALF_UP)));
+        assertThat(actualAmount, is(value(0.60)));
     }
 
     @Test
     public void checkout_returns25p_givenOnlyOneOrangeInShoppingCart() throws Exception {
         BigDecimal actualAmount = checkout.evaluateBasket(singletonList("Orange"));
-        assertThat(actualAmount, is(valueOf(0.25).setScale(2, ROUND_HALF_UP)));
+        assertThat(actualAmount, is(value(0.25)));
     }
 
     @Test
     public void checkout_returns2PoundsAnd5Pence_givenThreeApplesAndOneOrangeInShoppingCart() throws Exception {
         BigDecimal actualAmount = checkout.evaluateBasket(Arrays.asList("Apple", "Apple", "Orange", "Apple"));
-        assertThat(actualAmount, is(valueOf(2.05).setScale(2, ROUND_HALF_UP)));
+        assertThat(actualAmount, is(value(2.05)));
+    }
+    private BigDecimal value(double val) {
+        return valueOf(val).setScale(2, ROUND_HALF_UP);
     }
 }
