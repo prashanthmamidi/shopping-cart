@@ -2,35 +2,54 @@ package org.shopping.cart;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.valueOf;
 import static java.util.Arrays.asList;
 
 public class Checkout {
+    private final Function<String, Predicate<String>> fruitFunc = fruitName -> fruit -> fruit.equals(fruitName);
+
     public BigDecimal evaluateBasket(List<String> fruitBasket) {
         validateBasket(fruitBasket);
-        return fruitBasket.stream()
-                .map(basketWithPrice()::get)
-                .reduce(value(0.00), BigDecimal::add);
+
+        return buyOneGetOneOffer(getNumberOf("Apple", fruitBasket))
+                .add(threeForTwoOffer(getNumberOf("Orange", fruitBasket)));
     }
 
-    private boolean isValidFruit(List<String> fruitBasket) {
-        HashSet<String> validFruits = new HashSet<>(asList("Apple", "Orange"));
-        return validFruits.containsAll(fruitBasket);
+    private long getNumberOf(String fruitName, List<String> fruitBasket) {
+        return fruitBasket.stream().filter(fruitFunc.apply(fruitName)).count();
     }
+
+    private BigDecimal buyOneGetOneOffer(long numberOfApples) {
+        return valueOf(numberOfApples / 2 + numberOfApples % 2).multiply(basketWithPrice().get("Apple"));
+    }
+
+    private BigDecimal threeForTwoOffer(long numberOfOranges) {
+        return valueOf((numberOfOranges / 3) * 2 + numberOfOranges % 3).multiply(basketWithPrice().get("Orange"));
+    }
+
     private Map<String, BigDecimal> basketWithPrice() {
         Map<String, BigDecimal> basketPrice = new HashMap<>();
         basketPrice.put("Apple", value(0.60));
         basketPrice.put("Orange", value(0.25));
         return basketPrice;
     }
-    private BigDecimal value(double price) {
-        return valueOf(price).setScale(2, ROUND_HALF_UP);
-    }
+
     private void validateBasket(List<String> fruitBasket) {
         if (!isValidFruit(fruitBasket)) {
             throw new InvalidItemInBasketException("Invalid Item in the basket.");
         }
+    }
+
+    private boolean isValidFruit(List<String> fruitBasket) {
+        Set<String> validFruits = basketWithPrice().keySet();
+        return validFruits.containsAll(fruitBasket);
+    }
+
+    private BigDecimal value(double price) {
+        return valueOf(price).setScale(2, ROUND_HALF_UP);
     }
 }
