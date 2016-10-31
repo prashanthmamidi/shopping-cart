@@ -50,7 +50,7 @@ public class CheckoutTest {
         BigDecimal actualAmount = checkout.evaluateBasket(asList("Apple", "Apple", "Orange", "Apple"));
         assertThat(actualAmount, is(value(1.45)));
     }
-    
+
     @Test
     public void checkoutWithBuyOneGetOneOffer_returns60p_givenOnlyTwoApplesInBasket() throws Exception {
         BigDecimal actualAmount = checkout.evaluateBasket(asList("Apple", "Apple"));

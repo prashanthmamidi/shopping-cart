@@ -1,13 +1,15 @@
 package org.shopping.cart;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.math.BigDecimal.ROUND_HALF_UP;
 import static java.math.BigDecimal.valueOf;
-import static java.util.Arrays.asList;
 
 public class Checkout {
     private final Function<String, Predicate<String>> fruitFunc = fruitName -> fruit -> fruit.equals(fruitName);
